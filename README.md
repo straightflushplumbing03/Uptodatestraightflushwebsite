@@ -72,7 +72,7 @@ Any static file server works (`npx serve`, VS Code Live Server, etc.) — just d
 1. Push this repo to GitHub.
 2. Repo Settings → Pages → Source: deploy from branch `main`, folder `/ (root)`.
 3. Your site will be live at `https://<username>.github.io/<repo-name>/`.
-4. If deploying to a **custom domain**, add a `CNAME` file at the root containing your domain, and update the `<link rel="canonical">` and JSON-LD `url` fields across pages to match (currently set to `https://straightflushplumbing.com/`).
+4. The site is already configured for the custom domain `straightflushplumbingoc.com` — `scripts/build.py`'s shared `DOMAIN` constant drives every page's `<link rel="canonical">` and JSON-LD `url` fields. If the domain ever changes, update `DOMAIN` in `scripts/build.py` and re-run the generators rather than editing individual pages.
 
 Because every internal link is a **relative path** (`services/leak-detection.html`, not `/services/leak-detection.html`), the site works correctly whether it's hosted at a domain root or in a GitHub Pages subfolder — no path rewriting needed.
 
