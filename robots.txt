@@ -20,4 +20,4 @@ Allow: /
 User-agent: anthropic-ai
 Allow: /
 
-Sitemap: https://straightflushplumbing.com/sitemap.xml
+Sitemap: https://straightflushplumbingoc.com/sitemap.xml
