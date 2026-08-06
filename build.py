@@ -13,6 +13,8 @@ PHONE_DISPLAY = "(949) 374-6524"
 PHONE_TEL = "+19493746524"
 EMAIL = "straightflushplumbing03@gmail.com"
 ADDRESS = "78 Cameray Heights, Laguna Niguel, CA 92677"
+DOMAIN = "https://straightflushplumbingoc.com"
+OG_IMAGE = f"{DOMAIN}/assets/img/lance-hero.jpeg"
 GOOGLE_REVIEWS_URL = "https://share.google/WcJBYE3uu5FsppBTR"
 YELP_REVIEWS_URL = "https://www.yelp.com/biz/straight-flush-plumbing-and-leak-detection-laguna-niguel-3"
 
@@ -61,6 +63,15 @@ def p(prefix, path):
     return prefix + path
 
 def head(title, description, canonical, prefix, schema=""):
+    # Clean URL: strip index.html -> "", strip trailing .html -> "" so every
+    # generated page's canonical/og:url matches what Cloudflare Pages actually
+    # serves (it redirects the .html path to the clean one).
+    clean = canonical
+    if clean.endswith("index.html"):
+        clean = clean[: -len("index.html")]
+    elif clean.endswith(".html"):
+        clean = clean[: -len(".html")]
+    page_url = f"{DOMAIN}/{clean}"
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -68,15 +79,20 @@ def head(title, description, canonical, prefix, schema=""):
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{title}</title>
 <meta name="description" content="{description}">
-<link rel="canonical" href="https://straightflushplumbing.com/{canonical}">
+<link rel="canonical" href="{page_url}">
 <link rel="icon" href="{prefix}assets/img/logo.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{description}">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://straightflushplumbing.com/{canonical}">
-<meta name="twitter:card" content="summary">
+<meta property="og:url" content="{page_url}">
+<meta property="og:image" content="{OG_IMAGE}">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{title}">
+<meta name="twitter:description" content="{description}">
+<meta name="twitter:image" content="{OG_IMAGE}">
 <link rel="stylesheet" href="{prefix}assets/css/style.css">
 {schema}</head>
 <body>
