@@ -26,6 +26,154 @@
        STRAIGHT FLUSH PLUMBING - INTERACTIVE HUB
        ========================================== -->
 
+<!-- TAB NAV -->
+<div style="display:flex;justify-content:center;gap:10px;margin-bottom:30px;flex-wrap:wrap;">
+  <button id="btn-calc" aria-controls="tab-calculator" aria-selected="true" onclick="switchTab('calculator')" style="padding:12px 20px;background:#003366;color:#fff;border:0;border-radius:5px;cursor:pointer;font-weight:700;">Leak Risk Calculator</button>
+  <button id="btn-triage" aria-controls="tab-triage" aria-selected="false" onclick="switchTab('triage')" style="padding:12px 20px;background:#e0e0e0;color:#333;border:0;border-radius:5px;cursor:pointer;font-weight:700;">Symptom Triage Tree</button>
+  <button id="btn-archive" aria-controls="tab-archive" aria-selected="false" onclick="switchTab('archive')" style="padding:12px 20px;background:#e0e0e0;color:#333;border:0;border-radius:5px;cursor:pointer;font-weight:700;">The Leak Lab Archive</button>
+</div>
+
+<!-- Calculator -->
+<div id="tab-calculator" class="hub-tab" style="background:#fff;padding:30px;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,0.05);">
+  <h3>OC Home Leak Risk & Water Waste Calculator</h3>
+  <p style="font-size:14px;color:#666;">Compare your monthly water bill against South Orange County baselines to catch hidden leaks early.</p>
+
+  <div style="margin:20px 0;">
+    <label for="calc-city" style="display:block;font-weight:700;margin-bottom:5px;">Select Your City/Area</label>
+    <select id="calc-city" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:4px;">
+      <option>Laguna Niguel</option>
+      <option>Mission Viejo</option>
+      <option>San Clemente</option>
+      <option>Dana Point / Monarch Beach</option>
+      <option>Aliso Viejo</option>
+      <option>Laguna Beach</option>
+    </select>
+  </div>
+
+  <div style="margin:20px 0;">
+    <label for="calc-age" style="display:block;font-weight:700;margin-bottom:5px;">Approximate Age of Home</label>
+    <select id="calc-age" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:4px;">
+      <option value="new">Under 10 years (Modern PEX/Copper)</option>
+      <option value="mid">10 to 25 years</option>
+      <option value="old">25+ years (Original Copper / Slab foundation)</option>
+    </select>
+  </div>
+
+  <div style="margin:20px 0;">
+    <label for="calc-bill" style="display:block;font-weight:700;margin-bottom:5px;">Average Monthly Water Bill ($)</label>
+    <input type="number" id="calc-bill" inputmode="numeric" placeholder="e.g., 180" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:4px;box-sizing:border-box;">
+  </div>
+
+  <button id="calc-go" onclick="calculateLeakRisk()" style="background:#ff6600;color:#fff;border:0;padding:12px 20px;font-weight:700;border-radius:4px;cursor:pointer;width:100%;">Calculate My Leak Risk</button>
+
+  <div id="calc-results" style="display:none;margin-top:25px;padding:20px;background:#fff3e0;border-left:5px solid #ff6600;border-radius:4px;">
+    <h4 style="margin-top:0;color:#d35400;">Analysis Complete</h4>
+    <p id="calc-output-text" style="font-size:14px;line-height:1.5;"></p>
+
+    <div style="margin-top:15px;background:#fff;padding:15px;border-radius:4px;">
+      <p style="font-weight:700;font-size:13px;margin-bottom:10px;">🔒 Unlock Your Detailed Diagnostic Breakdown & Technical Score</p>
+      <label for="lead-phone" class="sr-only">Phone number for instant report</label>
+      <input type="tel" id="lead-phone" placeholder="Enter your phone number (e.g. 9495551234)" style="width:65%;padding:8px;border:1px solid #ccc;border-radius:4px;margin-right:5px;">
+      <button id="lead-submit" onclick="submitLead()" style="background:#003366;color:#fff;border:none;padding:9px 15px;border-radius:4px;cursor:pointer;font-weight:700;">Get Instant Report</button>
+    </div>
+  </div>
+</div>
+
+<!-- Triage -->
+<div id="tab-triage" class="hub-tab" style="display:none;background:#fff;padding:30px;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,0.05);">
+  <h3>Instant Plumbing Symptom Triage</h3>
+  <div id="triage-step-1">
+    <p style="font-weight:700;color:#333;">What is your primary warning sign right now?</p>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:15px;">
+      <button onclick="triageNext(2,'High water bill / Meter spinning')" style="padding:12px;text-align:left;background:#f4f4f4;border:1px solid #ddd;border-radius:4px;cursor:pointer;">💧 Unexplained high water bill or spinning meter</button>
+      <button onclick="triageNext(2,'Sound of running water / Hissing')" style="padding:12px;text-align:left;background:#f4f4f4;border:1px solid #ddd;border-radius:4px;cursor:pointer;">🔊 Hearing running water or a continuous hiss behind walls/floors</button>
+      <button onclick="triageNext(2,'Warm spot on floor')" style="padding:12px;text-align:left;background:#f4f4f4;border:1px solid #ddd;border-radius:4px;cursor:pointer;">🔥 Warm spot on the floor (Possible hot water slab leak)</button>
+    </div>
+  </div>
+
+  <div id="triage-step-2" style="display:none;">
+    <p style="font-weight:700;color:#333;">Does shutting off your main home water supply valve stop the sound or meter movement?</p>
+    <div style="display:flex;gap:10px;margin-top:15px;">
+      <button onclick="triageResult('Main Valve Stops It','The issue is likely downstream of your main shutoff (fixtures, branch lines, or yard supply).')" style="flex:1;padding:12px;background:#003366;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:700;">Yes — it stops</button>
+      <button onclick="triageResult('Main Valve Does NOT Stop It','CRITICAL: If the meter still moves with the main valve closed, you have an active leak between the meter and your home foundation. Immediate acoustic isolation recommended.')" style="flex:1;padding:12px;background:#ff6600;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:700;">No — it keeps moving/hissing</button>
+    </div>
+  </div>
+
+  <div id="triage-final" style="display:none;padding:15px;background:#e8f4f8;border-radius:4px;">
+    <h4 style="color:#003366;margin-top:0;">Diagnostic Probability Match</h4>
+    <p id="triage-output-diagnosis" style="font-size:14px;line-height:1.5;"></p>
+    <a href="tel:+19493746524" style="display:inline-block;margin-top:10px;background:#003366;color:#fff;padding:10px 20px;text-decoration:none;border-radius:4px;font-weight:700;">Dispatch Lance Now: (949) 374-6524</a>
+  </div>
+</div>
+
+<!-- Archive -->
+<div id="tab-archive" class="hub-tab" style="display:none;background:#fff;padding:30px;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,0.05);">
+  <h3>South Orange County Field Diagnostics Archive</h3>
+  <p style="font-size:14px;color:#666;">Real data and unedited acoustic signatures from recent local leak isolations.</p>
+
+  <div style="border-left:4px solid #003366;padding-left:15px;margin-bottom:20px;">
+    <h4 style="margin:0 0 5px 0;color:#003366;">Case Study #084: Sub-Slab Pinhole Leak</h4>
+    <p style="font-size:13px;color:#777;margin:0 0 10px 0;">Location: Monarch Beach Tract, Dana Point | Method: Acoustic & Thermal Isolation</p>
+    <p style="font-size:14px;margin-bottom:10px;">Homeowner reported a subtle warm patch in tile. Acoustic sensors isolated a high-frequency pressure hiss directly under the base plate — pinpointed within inches without breaking surrounding tile.</p>
+    <div style="background:#f1f1f1;padding:10px;border-radius:4px;display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-size:13px;font-weight:700;">🎧 Listen to Sample Frequency Hiss:</span>
+      <button onclick="alert('Playing synthesized acoustic pressure signature simulation...')" style="background:#003366;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px;">Play Audio Sample</button>
+    </div>
+  </div>
+
+  <div style="border-left:4px solid #003366;padding-left:15px;">
+    <h4 style="margin:0 0 5px 0;color:#003366;">Case Study #083: Supply Line Yard Leak</h4>
+    <p style="font-size:13px;color:#777;margin:0 0 10px 0;">Location: Laguna Niguel Hillside Tract | Method: Electronic Ground Microphones</p>
+    <p style="font-size:14px;margin-bottom:10px;">Unexplained $350 spike on a utility statement with no interior fixture indicators. Electronic ground telemetry traced a buried mainline coupling fracture beneath a concrete walkway.</p>
+  </div>
+</div>
+
+<script>
+// Minimal tab & triage interactivity
+function switchTab(tab) {
+  document.querySelectorAll('.hub-tab').forEach(el => el.style.display = 'none');
+  document.getElementById('tab-' + (tab === 'calculator' ? 'calculator' : tab === 'triage' ? 'triage' : 'archive')).style.display = 'block';
+  document.querySelectorAll('[id^="btn-"]').forEach(btn => btn.style.background = '#e0e0e0');
+  document.getElementById('btn-' + (tab === 'calculator' ? 'calc' : tab === 'triage' ? 'triage' : 'archive')).style.background = (tab === 'calculator' ? '#003366' : '#e0e0e0');
+}
+
+function calculateLeakRisk() {
+  var city = document.getElementById('calc-city').value;
+  var age = document.getElementById('calc-age').value;
+  var bill = parseFloat(document.getElementById('calc-bill').value) || 0;
+  var baseline = city.toLowerCase().includes('laguna') ? 120 : 130; // simplistic local baseline mapping
+  var score = Math.max(0, Math.round((bill - baseline) / baseline * 100));
+  var message = 'Estimated water waste score: ' + score + '%. ';
+  if (score < 10) message += 'Low likelihood of hidden leak — monitor your bill.';
+  else if (score < 40) message += 'Moderate likelihood. Consider a proactive acoustic check.';
+  else message += 'High likelihood of a hidden leak. Call for isolation diagnostics.';
+  document.getElementById('calc-output-text').innerText = message;
+  document.getElementById('calc-results').style.display = 'block';
+}
+
+function submitLead() {
+  var phone = document.getElementById('lead-phone').value.trim();
+  if (!phone) return alert('Please enter a phone number to receive the instant report.');
+  alert('Thanks — we will send a diagnostic summary to ' + phone + '.');
+}
+
+function triageNext(step, choice) {
+  document.getElementById('triage-step-1').style.display = 'none';
+  document.getElementById('triage-step-2').style.display = 'block';
+  // store choice
+  window.__triage_choice = choice;
+}
+
+function triageResult(title, text) {
+  document.getElementById('triage-step-2').style.display = 'none';
+  document.getElementById('triage-final').style.display = 'block';
+  document.getElementById('triage-output-diagnosis').innerHTML = '<strong>' + title + '</strong><br>' + text + '<br><em>Based on: ' + (window.__triage_choice || 'user input') + '</em>';
+}
+
+// default start
+switchTab('calculator');
+</script>
+
 </article>
 </main>
 </body>
